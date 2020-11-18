@@ -5,30 +5,33 @@
 #include <windows.h>
 
 #define VER "0.1"
-using namespace std;
 
 void list(FILE *fh) {
 
 	HANDLE ch = GetStdHandle(STD_OUTPUT_HANDLE);
-	FlushConsoleInputBuffer(ch);
+
 	char c;
 	while ((c = fgetc(fh)) != EOF) {
 		switch (c) {
 		case 'w':
 			SetConsoleTextAttribute(ch, FOREGROUND_BLUE);
+			printf("- [•");
 			break;
 		case 'n':
 			SetConsoleTextAttribute(ch, FOREGROUND_RED);
+			printf("- [ ");
 			break;
 		case 'f':
 			SetConsoleTextAttribute(ch, FOREGROUND_GREEN | FOREGROUND_RED);
+			printf("- [x");
 			break;
 		default:
 			SetConsoleTextAttribute(ch, 15);
 			break;
 		}
+		printf("] ");
 
-		fgetc(fh); // Handle comma.
+		fgetc(fh); // Consume comma.
 
 		char buff[256];
 		bool escaped = false;
@@ -37,33 +40,28 @@ void list(FILE *fh) {
 				switch (buff[i]) {
 				case '\\':
 					if (escaped)
-						cout << '\\';
-//						putchar('\\');
+						putchar('\\');
 					escaped ^= true;
 					break;
 				case ',':
 					if (escaped)
-//						putchar(',');
-						cout << ',';
+						putchar(',');
 					else
 						// TODO Handle error?
-//						putchar(',');
-						cout << ',';
+						putchar(',');
 					break;
 				case '\n':
 					if (!escaped)
 						goto END_ENTRY;
 					// @suppress("No break at end of case")
 				default:
-//					putchar(buff[i]);
-					cout << buff[i];
+					putchar(buff[i]);
 					break;
 				}
 			}
 		}
 		END_ENTRY: SetConsoleTextAttribute(ch, 15);
-		cout << '\n';
-//		printf("\n");
+		printf("\n");
 	}
 
 	fclose(fh);
@@ -94,14 +92,12 @@ void prompt(FILE *fh) {
 
 int main(int argc, char *args[]) {
 	if (argc == 1) {
-//		printf("Lister(ine) version %s.", VER);
-		cout << "Lister(ine) version %s.";
+		printf("Lister(ine) version %s.", VER);
 	} else {
 		if (argc == 2) {
 			FILE *fp = fopen(args[1], "a+");
 			if (!fp) {
-//				printf("Failed to open the file.");
-				cout << "Failed to open the file.";
+				printf("Failed to open the file.");
 			} else {
 				prompt(fp);
 			}
@@ -112,28 +108,20 @@ int main(int argc, char *args[]) {
 				case 'a': {
 					if (argc != 5) {
 						HANDLE ch = GetStdHandle(STD_OUTPUT_HANDLE);
-//						printf(
-//								"To append, you need to provide the text to append (as one argument) followed by the status of the item, one of ");
-						cout
-								<< "To append, you need to provide the text to append (as one argument) followed by the status of the item, one of ";
+						printf(
+								"To append, you need to provide the text to append (as one argument) followed by the status of the item, one of ");
 						SetConsoleTextAttribute(ch, FOREGROUND_BLUE);
-						cout << 'w';
-//						putchar('w');
+						putchar('w');
 						SetConsoleTextAttribute(ch, 15);
-//						printf(", ");
-						cout << ", ";
+						printf(", ");
 						SetConsoleTextAttribute(ch, FOREGROUND_RED);
-//						putchar('n');
-						cout << 'n';
+						printf("n");
 						SetConsoleTextAttribute(ch, 15);
-//						printf(", or ");
-						cout << ", or ";
+						printf(", or ");
 						SetConsoleTextAttribute(ch, FOREGROUND_GREEN);
-//						putchar('f');
-						cout << 'f';
+						printf("f");
 						SetConsoleTextAttribute(ch, 15);
-//						putchar('.');
-						cout << '.';
+						putchar('.');
 					} else {
 						FILE *fp = fopen(args[1], "a");
 						append(fp, args[3], args[4][0]);
@@ -142,21 +130,18 @@ int main(int argc, char *args[]) {
 					break;
 				case 'l':
 					if (argc != 3)
-//						printf("This option takes no arguments.");
-						cout << "This option takes no arguments.";
+						printf("This option takes no arguments.");
 					else {
 						FILE *fp = fopen(args[1], "r");
 						list(fp);
 					}
 					break;
 				default:
-//					printf("Unknown argument: %s", args[2]);
-					cout << "Unknown argument: " << args[2];
+					printf("Unknown argument: %s", args[2]);
 					break;
 				}
 			} else {
-//				printf("Cannot understand arguments.");
-				cout << "Cannot understand arguments.";
+				printf("Cannot understand arguments.");
 			}
 		}
 	}
